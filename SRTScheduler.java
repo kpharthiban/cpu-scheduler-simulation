@@ -16,7 +16,7 @@ public class SRTScheduler extends Scheduler {
 
         for (Process process : processes) {
             // TASHA
-            // Add your logic here (refer to FCFSScheduler.java)
+            // Add your logic here (refer to FCFSScheduler.java for example)
         }
     }
 

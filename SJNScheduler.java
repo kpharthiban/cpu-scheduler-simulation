@@ -16,7 +16,7 @@ public class SJNScheduler extends Scheduler {
 
         for (Process process : processes) {
             // AMI
-            // Add your logic here (refer to FCFSScheduler.java)
+            // Add your logic here (refer to FCFSScheduler.java for example)
         }
     }
 

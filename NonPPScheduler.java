@@ -16,7 +16,7 @@ public class NonPPScheduler extends Scheduler {
 
         for (PProcess process : p_processes) {
             // DERREL
-            // Add your logic here (refer to FCFSScheduler.java) -> take note of the variable change
+            // Add your logic here (refer to FCFSScheduler.java for example)
         }
     }
 
