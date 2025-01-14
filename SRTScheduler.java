@@ -12,11 +12,50 @@ public class SRTScheduler extends Scheduler {
     @Override
     public void schedule() {
         processes.sort(Comparator.comparingInt(Process::getArrivalTime));
-        int currentTime = 0;
+        PriorityQueue<Process> readyQueue = new PriorityQueue<>(Comparator.comparingInt(Process::getRemainingTime));
 
-        for (Process process : processes) {
-            // TASHA
-            // Add your logic here (refer to FCFSScheduler.java for example)
+        int currentTime = 0;
+        int completedProcesses = 0;
+        int n = processes.size();
+        Process currentProcess = null;
+        int prevTime = 0;
+
+        while (completedProcesses < n) {
+            // Add processes to the ready queue that have arrived by the current time
+            for (Process process : processes) {
+                if (process.getArrivalTime() <= currentTime && process.getRemainingTime() > 0 && !readyQueue.contains(process)) {
+                    readyQueue.add(process);
+                }
+            }
+
+            if (currentProcess != null && currentProcess.getRemainingTime() > 0) {
+                readyQueue.add(currentProcess);
+            }
+
+            if (!readyQueue.isEmpty()) {
+                currentProcess = readyQueue.poll();
+
+                if (currentProcess != null) {
+                    if (prevTime < currentTime) {
+                        ganttChart.add(new String[]{String.valueOf(prevTime), String.valueOf(currentTime), "Idle"});
+                    }
+
+                    currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
+                    currentTime++;
+
+                    if (currentProcess.getRemainingTime() == 0) {
+                        currentProcess.setCompletionTime(currentTime);
+                        completedProcesses++;
+                    }
+
+                    ganttChart.add(new String[]{String.valueOf(prevTime), String.valueOf(currentTime), currentProcess.getId()});
+                    prevTime = currentTime;
+                }
+            } else {
+                // If no process is ready, increment the time
+                ganttChart.add(new String[]{String.valueOf(currentTime), String.valueOf(currentTime + 1), "Idle"});
+                currentTime++;
+            }
         }
     }
 
