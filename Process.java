@@ -1,14 +1,17 @@
 public class Process {
     private String id;
-    private int arrivalTime;
     private int burstTime;
+    private int arrivalTime;
+    private int priority;
+    private int quantumTime;
     private int remainingTime; // New field
     private int completionTime; // To track when the process finishes
 
-    public Process(String id, int arrivalTime, int burstTime) {
+    public Process(String id, int burstTime, int arrivalTime, int priority, int quantumTime) {
         this.id = id;
-        this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
+        this.arrivalTime = arrivalTime;
+        this.priority = priority;
         this.remainingTime = burstTime; // Initially, remaining time equals burst time
     }
 
@@ -16,12 +19,20 @@ public class Process {
         return id;
     }
 
+    public int getBurstTime() {
+        return burstTime;
+    }
+
     public int getArrivalTime() {
         return arrivalTime;
     }
 
-    public int getBurstTime() {
-        return burstTime;
+    public int getPriority() {
+        return priority;
+    }
+
+    public int getQuantumTime() {
+        return quantumTime;
     }
 
     public int getRemainingTime() { 
