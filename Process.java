@@ -12,6 +12,7 @@ public class Process {
         this.burstTime = burstTime;
         this.arrivalTime = arrivalTime;
         this.priority = priority;
+        this.quantumTime = quantumTime;
         this.remainingTime = burstTime; // Initially, remaining time equals burst time
     }
 
@@ -48,6 +49,7 @@ public class Process {
     }
 
     public void setCompletionTime(int completionTime) { 
+        System.out.println("Completion time set to " + completionTime + " for process " + id);
         this.completionTime = completionTime;
     }
 }

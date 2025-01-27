@@ -4,20 +4,20 @@ public class NonPPScheduler extends Scheduler {
 
     private List<String[]> ganttChart;
 
-    public NonPPScheduler(List<Process> processes, List<PProcess> p_processes, List<RRProcess> rr_processes) {
-        super(processes, p_processes, rr_processes);
+    public NonPPScheduler(List<Process> processes) {
+        super(processes);
         this.ganttChart = new ArrayList<>();
     }
 
     @Override
     public void schedule() {
-        List<PProcess> remainingProcesses = new ArrayList<>(p_processes);
+        List<Process> remainingProcesses = new ArrayList<>(processes);
         int currentTime = 0;
         
         while (!remainingProcesses.isEmpty()) {
             // Find available processes at current time
-            List<PProcess> availableProcesses = new ArrayList<>();
-            for (PProcess p : remainingProcesses) {
+            List<Process> availableProcesses = new ArrayList<>();
+            for (Process p : remainingProcesses) {
                 if (p.getArrivalTime() <= currentTime) {
                     availableProcesses.add(p);
                 }
@@ -25,23 +25,24 @@ public class NonPPScheduler extends Scheduler {
             
             if (availableProcesses.isEmpty()) {
                 // No process available, move to next arrival time
-                PProcess nextProcess = remainingProcesses.stream()
-                    .min(Comparator.comparingInt(PProcess::getArrivalTime))
+                Process nextProcess = remainingProcesses.stream()
+                    .min(Comparator.comparingInt(Process::getArrivalTime))
                     .get();
                 currentTime = nextProcess.getArrivalTime();
                 continue;
             }
             
             // Get highest priority process (lowest priority number)
-            PProcess selectedProcess = availableProcesses.stream()
-                .min(Comparator.comparingInt(PProcess::getPriority))
+            Process selectedProcess = availableProcesses.stream()
+                .min(Comparator.comparingInt(Process::getPriority))
                 .get();
             
             int start = currentTime;
             int end = start + selectedProcess.getBurstTime();
-            String process_start = String.valueOf(start);
-            String process_end = String.valueOf(end);
-            ganttChart.add(new String[]{process_start, process_end, selectedProcess.getId()});
+            selectedProcess.setCompletionTime(end); // Set completion time
+            System.out.println("Setting completion time for process " + selectedProcess.getId() + " to " + end);
+            
+            ganttChart.add(new String[]{String.valueOf(start), String.valueOf(end), selectedProcess.getId()});
             
             currentTime = end;
             remainingProcesses.remove(selectedProcess);

@@ -4,8 +4,8 @@ public class SRTScheduler extends Scheduler {
 
     private List<String[]> ganttChart;
 
-    public SRTScheduler(List<Process> processes, List<PProcess> p_processes, List<RRProcess> rr_processes) {
-        super(processes, p_processes, rr_processes);
+    public SRTScheduler(List<Process> processes) {
+        super(processes);
         this.ganttChart = new ArrayList<>();
     }
 
@@ -44,7 +44,7 @@ public class SRTScheduler extends Scheduler {
                     currentTime++;
 
                     if (currentProcess.getRemainingTime() == 0) {
-                        currentProcess.setCompletionTime(currentTime);
+                        currentProcess.setCompletionTime(currentTime); // Set completion time
                         completedProcesses++;
                     }
 

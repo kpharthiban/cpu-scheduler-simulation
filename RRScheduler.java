@@ -5,8 +5,8 @@ public class RRScheduler extends Scheduler {
     private List<String[]> ganttChart;
     private Map<String, Integer> remainingBurstTimes; // Track remaining burst times
 
-    public RRScheduler(List<Process> processes, List<PProcess> p_processes, List<RRProcess> rr_processes) {
-        super(processes, p_processes, rr_processes);
+    public RRScheduler(List<Process> processes) {
+        super(processes);
         this.ganttChart = new ArrayList<>();
         this.remainingBurstTimes = new HashMap<>();
     }
@@ -14,29 +14,29 @@ public class RRScheduler extends Scheduler {
     @Override
     public void schedule() {
         // Sort processes by arrival time
-        rr_processes.sort(Comparator.comparingInt(RRProcess::getArrivalTime));
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime));
 
         // Initialize remaining burst times
-        for (RRProcess process : rr_processes) {
+        for (Process process : processes) {
             remainingBurstTimes.put(process.getId(), process.getBurstTime());
         }
 
         // Create a queue to hold the processes
-        Queue<RRProcess> queue = new LinkedList<>();
+        Queue<Process> queue = new LinkedList<>();
         int currentTime = 0;
         int index = 0; // Index to track processes not yet added to the queue
 
         // Add processes that have arrived by the current time to the queue
-        while (index < rr_processes.size() || !queue.isEmpty()) {
+        while (index < processes.size() || !queue.isEmpty()) {
             // Add all processes that have arrived by the current time to the queue
-            while (index < rr_processes.size() && rr_processes.get(index).getArrivalTime() <= currentTime) {
-                queue.add(rr_processes.get(index));
+            while (index < processes.size() && processes.get(index).getArrivalTime() <= currentTime) {
+                queue.add(processes.get(index));
                 index++;
             }
 
             if (!queue.isEmpty()) {
                 // Get the next process from the queue
-                RRProcess currentProcess = queue.poll();
+                Process currentProcess = queue.poll();
 
                 // Get the remaining burst time for the current process
                 int remainingBurstTime = remainingBurstTimes.get(currentProcess.getId());
@@ -56,14 +56,17 @@ public class RRScheduler extends Scheduler {
                 currentTime = end;
 
                 // Add any new processes that have arrived by the current time
-                while (index < rr_processes.size() && rr_processes.get(index).getArrivalTime() <= currentTime) {
-                    queue.add(rr_processes.get(index));
+                while (index < processes.size() && processes.get(index).getArrivalTime() <= currentTime) {
+                    queue.add(processes.get(index));
                     index++;
                 }
 
                 // If the process is not finished, add it back to the queue
                 if (remainingBurstTimes.get(currentProcess.getId()) > 0) {
                     queue.add(currentProcess);
+                } else {
+                    // Process is finished, set completion time
+                    currentProcess.setCompletionTime(end);
                 }
             } else {
                 // If no process is ready, increment the current time
