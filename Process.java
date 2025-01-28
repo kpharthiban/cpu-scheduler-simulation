@@ -66,4 +66,9 @@ public class Process {
     public void setWaitingTime(int waitingTime) {
         this.waitingTime = waitingTime;
     }
+
+    public int getWaitingTime() { 
+        return waitingTime;
+    }
+
 }

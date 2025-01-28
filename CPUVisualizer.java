@@ -174,21 +174,32 @@ public class CPUVisualizer extends JFrame {
 
         // Finalize Frame
         visualize(algo); // Update the Gantt chart and table
-    
+        
+        int totalTurnaroundTime = calculateTotalTurnaroundTime();
+        int totalWaitingTime = calculateTotalWaitingTime();
         // Average Values Section
         double avgTurnaroundTime = calculateAverageTurnaroundTime();
         double avgWaitingTime = calculateAverageWaitingTime();
-    
+        
+        JLabel totalTurnaroundLabel = new JLabel("Total Turnaround Time: " + totalTurnaroundTime);
+        JLabel totalWaitingLabel = new JLabel("Total Waiting Time: " + totalWaitingTime);
         JLabel avgTurnaroundLabel = new JLabel("Average Turnaround Time: " + String.format("%.2f", avgTurnaroundTime));
         JLabel avgWaitingLabel = new JLabel("Average Waiting Time: " + String.format("%.2f", avgWaitingTime));
+
+        totalTurnaroundLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        totalWaitingLabel.setFont(new Font("Arial", Font.BOLD, 16));
         avgTurnaroundLabel.setFont(new Font("Arial", Font.BOLD, 16));
         avgWaitingLabel.setFont(new Font("Arial", Font.BOLD, 16));
-    
+        
+        totalTurnaroundLabel.setForeground(new Color(40, 116, 166)); // Green text
+        totalWaitingLabel.setForeground(new Color(40, 116, 166)); // Green text
         avgTurnaroundLabel.setForeground(new Color(34, 139, 34)); // Green text
         avgWaitingLabel.setForeground(new Color(34, 139, 34)); // Green text
     
         JPanel avgPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         avgPanel.setBorder(new EmptyBorder(10, 30, 10, 10));
+        avgPanel.add(totalTurnaroundLabel);
+        avgPanel.add(totalWaitingLabel);
         avgPanel.add(avgTurnaroundLabel);
         avgPanel.add(avgWaitingLabel);
     
@@ -204,7 +215,22 @@ public class CPUVisualizer extends JFrame {
         frame.setSize(800, 700);
         frame.setVisible(true);
     }
-    
+
+    private int calculateTotalTurnaroundTime() {
+        int totalTurnaroundTime = 0;
+        for (Process process : processes) {
+            totalTurnaroundTime += (process.getCompletionTime() - process.getArrivalTime());
+        }
+        return totalTurnaroundTime;
+    }
+
+    private int calculateTotalWaitingTime() {
+        int totalWaitingTime = 0;
+        for (Process process : processes) {
+            totalWaitingTime += (process.getCompletionTime() - process.getArrivalTime() - process.getBurstTime());
+        }
+        return totalWaitingTime;
+    }
 
     private void visualize(String algo) {
         // List<Process> processesCopy = new ArrayList<>();
