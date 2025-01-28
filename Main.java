@@ -525,11 +525,11 @@ public class Main extends JFrame {
         });
 
         processInfoTable = new JTable(tableModel);
-        JTable processInfoTable = new JTable(tableModel);
         processInfoTable.setFont(new Font("Arial", Font.PLAIN, 14)); // Set table font
         processInfoTable.setRowHeight(25); // Increase row height for better readability
         processInfoTable.setGridColor(Color.LIGHT_GRAY); // Set grid color
-        processInfoTable.setEnabled(false);
+        processInfoTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Allow single row selection
+        processInfoTable.setEnabled(true); // Enable selection
 
         // Center-align data in cells
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();

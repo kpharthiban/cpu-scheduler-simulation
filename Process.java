@@ -6,6 +6,8 @@ public class Process {
     private int quantumTime;
     private int remainingTime; // New field
     private int completionTime; // To track when the process finishes
+    private int turnaroundTime;
+    private int waitingTime;
 
     public Process(String id, int burstTime, int arrivalTime, int priority, int quantumTime) {
         this.id = id;
@@ -51,5 +53,17 @@ public class Process {
     public void setCompletionTime(int completionTime) { 
         System.out.println("Completion time set to " + completionTime + " for process " + id);
         this.completionTime = completionTime;
+    }
+
+    public void setTurnaroundTime(int turnaroundTime) {
+        this.turnaroundTime = turnaroundTime;
+    }
+
+    public int getTurnaroundTime() { 
+        return turnaroundTime;
+    }
+
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
     }
 }

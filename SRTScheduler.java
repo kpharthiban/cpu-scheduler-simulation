@@ -28,50 +28,73 @@ public class SRTScheduler extends Scheduler {
 
     @Override
     public void schedule() {
-        processes.sort(Comparator.comparingInt(Process::getArrivalTime)); // sort process by arrival time
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime)); // Sort by arrival time
+
         PriorityQueue<Process> readyQueue = new PriorityQueue<>(
             (p1, p2) -> {
-                int burstTimeComparison = Integer.compare(p1.getRemainingTime(), p2.getRemainingTime()); //compare shortest remaining time
-                if (burstTimeComparison == 0) {
-                    return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime()); // FCFS if burst times are equal
+                if (p1.getRemainingTime() != p2.getRemainingTime()) {
+                    return Integer.compare(p1.getRemainingTime(), p2.getRemainingTime()); // Sort by remaining time
                 }
-                return burstTimeComparison;
+                return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime()); // FCFS if tie
             }
         );
 
         int currentTime = 0;
         int completedProcesses = 0;
         int n = processes.size();
+        Process currentProcess = null;
+        Process lastExecutedProcess = null; // Track the last executed process
 
         while (completedProcesses < n) {
-            // Add processes to the ready queue if they have arrived
+            // Add new processes that have arrived to the ready queue
             for (Process process : processes) {
-                if (process.getArrivalTime() <= currentTime && process.getRemainingTime() > 0) {
+                if (process.getArrivalTime() == currentTime) {
                     readyQueue.add(process);
                 }
             }
 
-            if (readyQueue.isEmpty()) {
-                currentTime++; // No process to execute, increment time
-                continue;
+            // If a new process with a shorter burst time arrives, preempt the current process
+            if (currentProcess != null && !readyQueue.isEmpty() && readyQueue.peek().getRemainingTime() < currentProcess.getRemainingTime()) {
+                readyQueue.add(currentProcess); // Put the current process back into the queue
+                currentProcess = readyQueue.poll(); // Switch to the new process
             }
 
-            Process currentProcess = readyQueue.poll(); // process with the shortest remaining time
-
-            int timeToExecute = 1; 
-            //update gantt chart
-            ganttChart.add(new String[] {String.valueOf(currentTime), String.valueOf(currentTime + timeToExecute), currentProcess.getId()});
-            currentTime += timeToExecute;
-
-            currentProcess.setRemainingTime(currentProcess.getRemainingTime() - timeToExecute);//decrease remaining time for current process
-
-            // Check if the process is completed
-            if (currentProcess.getRemainingTime() == 0) {
-                currentProcess.setCompletionTime(currentTime);
-                completedProcesses++;
+            // Pick the process with the shortest remaining time
+            if (currentProcess == null && !readyQueue.isEmpty()) {
+                currentProcess = readyQueue.poll();
             }
 
-            readyQueue.clear(); // Clear the ready queue to re-evaluate at the next time unit
+            if (currentProcess != null) {
+                // ✅ FIX: Combine Gantt Chart blocks
+                if (lastExecutedProcess != null && lastExecutedProcess.getId().equals(currentProcess.getId())) {
+                    // If the same process continues, update the end time of the last Gantt chart entry
+                    ganttChart.get(ganttChart.size() - 1)[1] = String.valueOf(currentTime + 1);
+                } else {
+                    // Otherwise, create a new Gantt chart entry
+                    ganttChart.add(new String[]{String.valueOf(currentTime), String.valueOf(currentTime + 1), currentProcess.getId()});
+                }
+                
+                lastExecutedProcess = currentProcess; // Update last executed process
+
+                // Execute process for 1 unit
+                currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
+                currentTime++;
+
+                // If the process finishes, record its completion time
+                if (currentProcess.getRemainingTime() == 0) {
+                    currentProcess.setCompletionTime(currentTime);
+                    completedProcesses++;
+                    currentProcess = null; // Reset current process
+                }
+            } else {
+                currentTime++; // No process is ready, increment time
+            }
+        }
+
+        // Compute turnaround time & waiting time
+        for (Process p : processes) {
+            p.setTurnaroundTime(p.getCompletionTime() - p.getArrivalTime());
+            p.setWaitingTime(p.getTurnaroundTime() - p.getBurstTime());
         }
     }
 
