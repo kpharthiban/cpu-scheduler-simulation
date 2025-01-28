@@ -1,4 +1,5 @@
-### How to compile the code?
+## How to compile the code?
+To compile the code, you can use the following command in your terminal/command prompt:
 ```
 compile.bat
 ```
